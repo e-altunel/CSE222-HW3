@@ -1,4 +1,6 @@
-public abstract class AbstractDevice {
+
+
+public abstract class AbstractDevice implements Device {
   private String categoryName;
   private String name;
   private Double price;
@@ -12,23 +14,45 @@ public abstract class AbstractDevice {
     this.quantity = quantity;
   }
 
-  public String getCategoryName() { return categoryName; }
+  @Override
+  public String getCategoryName() {
+    return categoryName;
+  }
 
+  @Override
   public void setCategoryName(final String categoryName) {
     this.categoryName = categoryName;
   }
 
-  public String getName() { return name; }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-  public void setName(final String name) { this.name = name; }
+  @Override
+  public void setName(final String name) {
+    this.name = name;
+  }
 
-  public Double getPrice() { return price; }
+  @Override
+  public Double getPrice() {
+    return price;
+  }
 
-  public void setPrice(final Double price) { this.price = price; }
+  @Override
+  public void setPrice(final Double price) {
+    this.price = price;
+  }
 
-  public Integer getQuantity() { return quantity; }
+  @Override
+  public Integer getQuantity() {
+    return quantity;
+  }
 
-  public void setQuantity(final Integer quantity) { this.quantity = quantity; }
+  @Override
+  public void setQuantity(final Integer quantity) {
+    this.quantity = quantity;
+  }
 
   @Override
   public boolean equals(final Object obj) {
@@ -65,6 +89,14 @@ public abstract class AbstractDevice {
   @Override
   public String toString() {
     return String.format("Category: %s, Name: %s, Price: %.2f$, Quantity:%d",
+                         categoryName, name, price, quantity);
+  }
+
+  @Override
+  public String toString(int[] fieldWidths) {
+    return String.format("| %-" + fieldWidths[0] + "s | %-" + fieldWidths[1] +
+                             "s | %" + (fieldWidths[2] - 2) + ".2f $ | %" +
+                             fieldWidths[3] + "d |",
                          categoryName, name, price, quantity);
   }
 }
