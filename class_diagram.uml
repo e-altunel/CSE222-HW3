@@ -1,0 +1,89 @@
+@startuml Class Diagram
+
+interface Device {
+  + getCategoryName(): String
+  + setCategoryName(categoryName: String): void
+  + getCategory(): Inventory.Category
+  + setCategory(category: Inventory.Category): void
+  + getName(): String
+  + setName(name: String): void
+  + getPrice(): double
+  + setPrice(price: double): void
+  + getQuantity(): int
+  + setQuantity(quantity: int): void
+  + equals(obj: Object): boolean
+  + toString(): String
+  + toString(int[] fieldWidths): String
+}
+
+abstract AbstractDevice {
+  - categoryName: String
+  - category: Inventory.Category
+  - name: String
+  - price: double
+  - quantity: int
+  + AbstractDevice(categoryName: String, category: Inventory.Category, name: String, price: double, quantity: int)
+}
+
+Device <|-- AbstractDevice
+
+class Accessory {
+  + Accessory(name: String, price: double, quantity: int)
+}
+
+class Computer {
+  + Computer(name: String, price: double, quantity: int)
+}
+
+class Phone {
+  + Phone(name: String, price: double, quantity: int)
+}
+
+class SmartWatch {
+  + SmartWatch(name: String, price: double, quantity: int)
+}
+
+class Tablet {
+  + Tablet(name: String, price: double, quantity: int)
+}
+
+AbstractDevice <|-- Accessory
+AbstractDevice <|-- Computer
+AbstractDevice <|-- Phone
+AbstractDevice <|-- SmartWatch
+AbstractDevice <|-- Tablet
+
+class Inventory {
+  - devices: List<List<Device>>
+  + Inventory()
+  - addDevice(device: Device): void
+  + addDevice(scanner: Scanner): void
+  + removeDevice(scanner: Scanner): void
+  + updateDevice(scanner: Scanner): void
+  + listDevices(): void
+  + findCheapestDevice(): void
+  + sortByPrice(): void
+  + calculateTotalValue(): double
+  + restockDevice(scanner: Scanner): void
+  + exportInventory(): void
+  - findDevice(name: String): Device
+}
+
+enum Inventory.Category {
+  - LIGHT
+  - WATER
+  - TEMPERATURE
+  - HUMIDITY
+  - FERTILIZER
+  - AIRFLOW
+}
+
+class InventoryManager {
+  - InventoryManager()
+  + main(args: String[]): void
+  - PrintMenu(): void
+  + printError(message: String): void
+  + printSuccess(message: String): void
+  + waitForEnter(scanner: Scanner): void  
+}
+@enduml

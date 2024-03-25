@@ -1,15 +1,35 @@
-
-
+import java.io.FileWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+/**
+ * Inventory.java
+ * This class represents an inventory of devices.
+ */
 public class Inventory {
-  private LinkedList<ArrayList<AbstractDevice>> devices;
+  private LinkedList<ArrayList<Device>> devices;
 
-  private enum Category { COMPUTER, PHONE, TABLET, SMARTWATCH, ACCESSORY }
+  /**
+   * Enumeration of device categories.
+   */
+  public enum Category {
+    /** Computer category. */
+    COMPUTER,
+    /** Phone category. */
+    PHONE,
+    /** Tablet category. */
+    TABLET,
+    /** Smartwatch category. */
+    SMARTWATCH,
+    /** Accessory category. */
+    ACCESSORY
+  }
 
+  /**
+   * Constructs a new Inventory object.
+   */
   public Inventory() {
     devices = new LinkedList<>();
     devices.add(new ArrayList<>()); // COMPUTER
@@ -19,6 +39,11 @@ public class Inventory {
     devices.add(new ArrayList<>()); // ACCESSORY
   }
 
+  /**
+   * Adds a device to the inventory using the user input.
+   *
+   * @param scanner the scanner to get input
+   */
   public void addDevice(Scanner scanner) {
     String type;
     String name;
@@ -72,6 +97,11 @@ public class Inventory {
     InventoryManager.waitForEnter(scanner);
   }
 
+  /**
+   * Adds a device to the inventory using the specified device.
+   *
+   * @param device the device to add
+   */
   private void addDevice(Device device) {
     if (device instanceof Computer) {
       devices.get(Category.COMPUTER.ordinal()).add((Computer)device);
@@ -86,12 +116,35 @@ public class Inventory {
     }
   }
 
-  // ! public void removeDevice(Scanner scanner) {
+  /**
+   * Removes a device from the inventory using the user input.
+   *
+   * @param scanner the scanner to get input
+   */
+  public void removeDevice(Scanner scanner) {
+    System.out.print("Please enter the name of the device to remove: ");
+    String name = scanner.nextLine();
+    Device device = findDevice(name);
+    if (device == null) {
+      InventoryManager.printError("Device not found");
+      InventoryManager.waitForEnter(scanner);
+      return;
+    }
+    devices.get(device.getCategory().ordinal()).remove(device);
+    InventoryManager.printSuccess("Device removed successfully");
+    InventoryManager.waitForEnter(scanner);
+  }
 
+  /**
+   * Updates a device in the inventory using the user input. The user can update
+   * the price and quantity of the device.
+   *
+   * @param scanner the scanner to get input
+   */
   public void updateDevice(Scanner scanner) {
     System.out.print("Please enter the name of the device to update: ");
     String name = scanner.nextLine();
-    AbstractDevice device = findDevice(name);
+    Device device = findDevice(name);
     if (device == null) {
       InventoryManager.printError("Device not found");
       InventoryManager.waitForEnter(scanner);
@@ -121,11 +174,17 @@ public class Inventory {
     InventoryManager.waitForEnter(scanner);
   }
 
+  /**
+   * Lists all devices in the inventory. The devices are listed by category.
+   * The user can see the category, name, price, and quantity of each device.
+   * If there are no devices in the inventory, an error message is displayed.
+   */
   public void listDevices() {
+    int deviceCount = 0;
     boolean isEmpty = true;
     for (int i = 0; i < devices.size(); i++) {
-      for (AbstractDevice device : devices.get(i)) {
-        System.out.println(i + 1 + ". " + device);
+      for (Device device : devices.get(i)) {
+        System.out.println((++deviceCount) + ". " + device);
         isEmpty = false;
       }
     }
@@ -134,10 +193,15 @@ public class Inventory {
     }
   }
 
+  /**
+   * Finds the cheapest device in the inventory. The user can see the category,
+   * name, price, and quantity of the cheapest device. If there are no devices
+   * in the inventory, an error message is displayed.
+   */
   public void findCheapestDevice() {
-    AbstractDevice cheapest = null;
+    Device cheapest = null;
     for (int i = 0; i < devices.size(); i++) {
-      for (AbstractDevice device : devices.get(i)) {
+      for (Device device : devices.get(i)) {
         if (cheapest == null || device.getPrice() < cheapest.getPrice()) {
           cheapest = device;
         }
@@ -150,32 +214,49 @@ public class Inventory {
     }
   }
 
+  /**
+   * Sorts all devices in the inventory by price. The devices are sorted in
+   * ascending order by price. The user can see the category, name, price, and
+   * quantity of each device.
+   */
   public void sortByPrice() {
-    ArrayList<AbstractDevice> sortedDevices = new ArrayList<>();
+    ArrayList<Device> sortedDevices = new ArrayList<>();
     for (int i = 0; i < devices.size(); i++) {
       sortedDevices.addAll(devices.get(i));
     }
     sortedDevices.sort((a, b) -> Double.compare(a.getPrice(), b.getPrice()));
-    for (AbstractDevice device : sortedDevices) {
+    for (Device device : sortedDevices) {
       System.out.println(device);
     }
   }
 
-  public void calculateTotalValue() {
+  /**
+   * Calculates the total value of all devices in the inventory. The user can
+   * see the total value of all devices in the inventory.
+   *
+   * @return the total value of all devices in the inventory
+   */
+  public double calculateTotalValue() {
     double totalValue = 0;
     for (int i = 0; i < devices.size(); i++) {
-      for (AbstractDevice device : devices.get(i)) {
+      for (Device device : devices.get(i)) {
         totalValue += device.getPrice() * device.getQuantity();
       }
     }
-    System.out.printf("The total value of the inventory is: %.2f $\n",
-                      totalValue);
+    return totalValue;
   }
 
+  /**
+   * Restocks a device in the inventory using the user input. The user can add
+   * or remove stock from the device. The user can see the new quantity of the
+   * device. If the device is not found, an error message is displayed.
+   *
+   * @param scanner the scanner to get input
+   */
   public void restockDevice(Scanner scanner) {
     System.out.print("Please enter the name of the device to restock: ");
     String name = scanner.nextLine();
-    AbstractDevice device = findDevice(name);
+    Device device = findDevice(name);
     if (device == null) {
       InventoryManager.printError("Device not found");
       InventoryManager.waitForEnter(scanner);
@@ -207,16 +288,23 @@ public class Inventory {
     }
   }
 
-  public void exportInventory() {
-    System.out.println("Electronic Store Inventory");
-    System.out.println("Generated on: " + LocalDate.now());
-    System.out.println();
+  /**
+   * Exports the inventory to a file. The user can see the category, name,
+   * price, and quantity of each device. The user can also see the total number
+   * of devices and the total value of the inventory.
+   *
+   * @throws Exception if an error occurs
+   */
+  public void exportInventory() throws Exception {
+    FileWriter writer = new FileWriter("export.txt");
+    writer.write("Electronic Store Inventory\n");
+    writer.write("Generated on: " + LocalDate.now() + "\n\n");
 
     int fieldWidths[] = {8, 4, 5, 8};
     int deviceCount = 0;
     boolean isEmpty = true;
     for (int i = 0; i < devices.size(); i++) {
-      for (AbstractDevice device : devices.get(i)) {
+      for (Device device : devices.get(i)) {
         deviceCount++;
         isEmpty = false;
         fieldWidths[0] =
@@ -230,35 +318,52 @@ public class Inventory {
       }
     }
     if (!isEmpty) {
-      System.out.println("-".repeat(19 + fieldWidths[0] + fieldWidths[1] +
-                                    fieldWidths[2] + fieldWidths[3]));
-      System.out.printf("| No. | %-" + fieldWidths[0] + "s | %-" +
-                            fieldWidths[1] + "s | %-" + fieldWidths[2] +
-                            "s | %-" + fieldWidths[3] + "s |\n",
-                        "Category", "Name", "Price", "Quantity");
-      System.out.println("-".repeat(19 + fieldWidths[0] + fieldWidths[1] +
-                                    fieldWidths[2] + fieldWidths[3]));
+      writer.write("-".repeat(19 + fieldWidths[0] + fieldWidths[1] +
+                              fieldWidths[2] + fieldWidths[3]) +
+                   "\n");
+      writer.write(String.format(
+          "| No. | %-" + fieldWidths[0] + "s | %-" + fieldWidths[1] + "s | %-" +
+              fieldWidths[2] + "s | %-" + fieldWidths[3] + "s |\n",
+          "Category", "Name", "Price", "Quantity"));
+      writer.write("-".repeat(19 + fieldWidths[0] + fieldWidths[1] +
+                              fieldWidths[2] + fieldWidths[3]) +
+                   "\n");
+      int deviceIndex = 0;
       for (int i = 0; i < devices.size(); i++) {
-        for (AbstractDevice device : devices.get(i)) {
-          System.out.printf("| %3d %s\n", i + 1, device.toString(fieldWidths));
+        for (Device device : devices.get(i)) {
+          writer.write(String.format(
+              "| %3d | %-" + fieldWidths[0] + "s | %-" + fieldWidths[1] +
+                  "s | %-" + fieldWidths[2] + "s | %-" + fieldWidths[3] +
+                  "s |\n",
+              ++deviceIndex, device.getCategoryName(), device.getName(),
+              String.format("%.2f $", device.getPrice()),
+              device.getQuantity()));
         }
       }
-      System.out.println("-".repeat(19 + fieldWidths[0] + fieldWidths[1] +
-                                    fieldWidths[2] + fieldWidths[3]));
+      writer.write("-".repeat(19 + fieldWidths[0] + fieldWidths[1] +
+                              fieldWidths[2] + fieldWidths[3]) +
+                   "\n");
     } else {
-      InventoryManager.printError("No devices in inventory");
-      System.out.println();
+      writer.write("No devices in inventory\n");
     }
 
-    System.out.println("Summary:");
-    System.out.println("Total number of devices: " + deviceCount);
-    calculateTotalValue();
-    System.out.println();
+    writer.write("\n");
+    writer.write("Summary:\n");
+    writer.write("Total number of devices: " + deviceCount + "\n");
+    writer.write("Total value of inventory: " +
+                 String.format("%.2f $", calculateTotalValue()) + "\n");
+    writer.close();
   }
 
-  private AbstractDevice findDevice(String name) {
+  /**
+   * Finds a device in the inventory using the specified name.
+   *
+   * @param name the name of the device to find
+   * @return the device with the specified name or null if not found
+   */
+  private Device findDevice(String name) {
     for (int i = 0; i < devices.size(); i++) {
-      for (AbstractDevice device : devices.get(i)) {
+      for (Device device : devices.get(i)) {
         if (device.getName().equals(name)) {
           return device;
         }

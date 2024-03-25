@@ -1,7 +1,23 @@
 import java.util.Scanner;
 
+/**
+ * InventoryManager.java
+ * This class represents the inventory management system.
+ */
 public class InventoryManager {
 
+  /**
+   * Private constructor for the InventoryManager class.
+   */
+  private InventoryManager() {
+    // This class should not be instantiated
+  }
+
+  /**
+   * Main method for the inventory management system.
+   *
+   * @param args the command line arguments
+   */
   public static void main(String[] args) {
     System.out.println("Welcome to the inventory management system.");
     boolean isFinished = false;
@@ -20,6 +36,9 @@ public class InventoryManager {
       case 1:
         inventory.addDevice(scanner);
         break;
+      case 2:
+        inventory.removeDevice(scanner);
+        break;
       case 3:
         inventory.updateDevice(scanner);
         break;
@@ -35,14 +54,19 @@ public class InventoryManager {
         inventory.sortByPrice();
         break;
       case 7:
-        inventory.calculateTotalValue();
+        System.out.println("The total value of the inventory is: " +
+                           inventory.calculateTotalValue());
         waitForEnter(scanner);
         break;
       case 8:
         inventory.restockDevice(scanner);
         break;
       case 9:
-        inventory.exportInventory();
+        try {
+          inventory.exportInventory();
+        } catch (Exception e) {
+          printError("Failed to export inventory");
+        }
         waitForEnter(scanner);
         break;
       default:
@@ -53,6 +77,9 @@ public class InventoryManager {
     scanner.close();
   }
 
+  /**
+   * Prints the menu options for the inventory management system.
+   */
   private static void PrintMenu() {
     System.out.println("Please select an option:");
     System.out.println("1. Add a device to the inventory.");
@@ -67,14 +94,29 @@ public class InventoryManager {
     System.out.println("0. Exit the program.");
   }
 
+  /**
+   * Prints an error message with red text.
+   *
+   * @param message the error message
+   */
   public static void printError(String message) {
     System.out.println("\033[1;31m[ERROR]\033[0m " + message);
   }
 
+  /**
+   * Prints a success message with green text.
+   *
+   * @param message the success message
+   */
   public static void printSuccess(String message) {
     System.out.println("\033[1;32m[SUCCESS]\033[0m " + message);
   }
 
+  /**
+   * Waits for the user to press enter.
+   *
+   * @param scanner the scanner object to read input
+   */
   public static void waitForEnter(Scanner scanner) {
     System.out.print("Enter any key to continue...");
     scanner.nextLine();
